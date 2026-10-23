@@ -6,8 +6,8 @@
 <meta name="description" content="딸기 토끼, 구름 고양이, 생일 햄찌! 귀여운 그림 조각을 끌어서 맞추는 퍼즐 게임">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://parksunghyon.github.io/mallang-puzzle/">
-<meta property="og:site_name" content="말랑 퍼즐">
-<meta property="og:title" content="말랑 퍼즐 🧩 같이 맞춰요!">
+<meta property="og:site_name" content="윤지 말랑 퍼즐">
+<meta property="og:title" content="윤지 말랑 퍼즐 🧩 같이 맞춰요!">
 <meta property="og:description" content="딸기 토끼, 구름 고양이, 생일 햄찌! 귀여운 그림 조각을 끌어서 맞추는 퍼즐 게임">
 <meta property="og:image" content="https://parksunghyon.github.io/mallang-puzzle/og-image.png">
 <meta property="og:image:width" content="1200">
@@ -16,7 +16,7 @@
 <meta name="twitter:image" content="https://parksunghyon.github.io/mallang-puzzle/og-image.png">
 <link rel="icon" type="image/png" href="icon.png">
 <link rel="apple-touch-icon" href="icon.png">
-<title>말랑 퍼즐</title>
+<title>윤지 말랑 퍼즐</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <meta name="theme-color" content="#fff2f6">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -181,7 +181,7 @@ button:focus-visible{outline:3px solid var(--berry);outline-offset:2px}
 <main class="app" id="menu">
   <header class="top">
     <div class="brand">
-      <h1>말랑 <span>퍼즐</span></h1>
+      <h1><span>윤지</span> 말랑 퍼즐</h1>
       <p>조각을 끌어서 제자리에 쏙!</p>
     </div>
     <button class="icon-btn" id="soundBtn" aria-label="소리 끄기" aria-pressed="true">
@@ -499,7 +499,7 @@ $("shareUrl").value=SHARE_URL;
 let toastT=0;
 function toast(msg){ const t=$("toast"); t.textContent=msg; t.hidden=false; clearTimeout(toastT); toastT=setTimeout(()=>t.hidden=true,2600); }
 $("shareBtn").addEventListener("click",()=>{
-  const text="말랑 퍼즐 같이 해요! 귀여운 그림 조각 맞추기 "+SHARE_URL;
+  const text="윤지 말랑 퍼즐 같이 해요! 귀여운 그림 조각 맞추기 "+SHARE_URL;
   const fallback=()=>{ const i=$("shareUrl"); i.focus(); i.select(); toast("링크를 길게 눌러 복사해 주세요"); };
   try{
     navigator.clipboard.writeText(text).then(()=>toast("복사했어요! 카톡 대화방에 붙여넣기 하세요"),fallback);
