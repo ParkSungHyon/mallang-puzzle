@@ -29,7 +29,8 @@ android {
     buildTypes {
         release {
             isMinifyEnabled = false
-            signingConfig = signingConfigs.getByName("release")
+            // 서명키가 있으면 서명, 없으면 서명 전 파일을 만들고 나중에 jarsigner로 서명
+            if (System.getenv("KS_FILE") != null) signingConfig = signingConfigs.getByName("release")
         }
     }
     compileOptions {

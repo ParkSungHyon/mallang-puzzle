@@ -3,7 +3,7 @@ name: Build Android app
 on:
   push:
     branches: [main]
-    paths-ignore: ["release/**", "store/**", "*.md"]
+    paths-ignore: ["release/**", "store/**", "*.md", "privacy.html"]
   workflow_dispatch:
 
 permissions:
@@ -53,7 +53,7 @@ jobs:
           if [ -n "$KS_FILE" ]; then
             gradle bundleRelease assembleRelease --no-daemon
           else
-            gradle assembleDebug --no-daemon
+            gradle bundleRelease assembleDebug --no-daemon
           fi
 
       - name: Save files into release folder
@@ -63,6 +63,7 @@ jobs:
             cp android/app/build/outputs/bundle/release/app-release.aab release/mallang-puzzle.aab
             cp android/app/build/outputs/apk/release/app-release.apk release/mallang-puzzle.apk
           else
+            cp android/app/build/outputs/bundle/release/app-release.aab release/mallang-puzzle-unsigned.aab
             cp android/app/build/outputs/apk/debug/app-debug.apk release/mallang-puzzle-test.apk
           fi
           echo "build ${GITHUB_RUN_NUMBER} ($(date -u +%F))" > release/VERSION.txt
