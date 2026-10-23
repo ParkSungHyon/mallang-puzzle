@@ -59,7 +59,7 @@ jobs:
       - name: Save files into release folder
         run: |
           mkdir -p release
-          if [ -f android/app/build/outputs/bundle/release/app-release.aab ]; then
+          if [ -n "$KS_FILE" ]; then
             cp android/app/build/outputs/bundle/release/app-release.aab release/mallang-puzzle.aab
             cp android/app/build/outputs/apk/release/app-release.apk release/mallang-puzzle.apk
           else
