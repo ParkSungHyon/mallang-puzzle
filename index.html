@@ -70,7 +70,7 @@ button:focus-visible{outline:3px solid var(--berry);outline-offset:2px}
 #menu{max-width:760px;gap:16px;padding-block:14px 28px}
 .step{font-family:var(--display);font-size:19px;margin:4px 0 -6px;color:var(--ink)}
 .step em{font-style:normal;color:var(--berry-deep)}
-.pics{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+.pics{display:grid;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:10px}
 .pic{
   background:var(--paper);border-radius:22px;padding:10px 10px 12px;
   box-shadow:0 4px 0 var(--line);display:flex;flex-direction:column;align-items:center;gap:8px;
@@ -78,7 +78,13 @@ button:focus-visible{outline:3px solid var(--berry);outline-offset:2px}
 }
 .pic:active{transform:scale(.97)}
 .pic img{width:100%;aspect-ratio:1;border-radius:16px;display:block}
-.pic span{font-size:20px}
+.pic span{font-size:18px;text-align:center;line-height:1.2}
+.pic .add{
+  width:100%;aspect-ratio:1;border-radius:16px;border:3px dashed var(--line);background:var(--tray);
+  display:grid;place-items:center;position:relative;color:var(--berry-deep);
+}
+.pic .add svg{width:44%;height:44%}
+.pic .add b{position:absolute;right:16%;bottom:16%;width:34px;height:34px;border-radius:50%;background:var(--berry);color:#fff;font-weight:400;font-size:26px;line-height:34px}
 .pic small{font-family:var(--body);font-size:13px;color:var(--ink-soft);margin-top:-6px}
 .share{
   background:var(--paper);border-radius:22px;padding:16px;box-shadow:0 4px 0 var(--line);
@@ -169,8 +175,9 @@ button:focus-visible{outline:3px solid var(--berry);outline-offset:2px}
 @media (max-width:420px){
   h1{font-size:26px}
   .brand p{display:none}
-  .pic span{font-size:13px}
-  .pic img{max-width:60px}
+  .pic span{font-size:15px}
+  .pic small{font-size:11px}
+  .pic{padding:7px 7px 9px;border-radius:18px}
   .tool{padding:8px 8px;font-size:13px}
   .status{gap:7px}
   .status .mini{width:36px;height:36px}
@@ -196,8 +203,9 @@ button:focus-visible{outline:3px solid var(--berry);outline-offset:2px}
     <button class="lvl" role="radio" data-n="5"><b>어려움</b><small>25조각</small></button>
   </div>
 
-  <p class="step"><em>2.</em> 그림을 누르면 시작해요</p>
+  <p class="step"><em>2.</em> 그림이나 사진을 고르면 시작해요</p>
   <div class="pics" id="pics"></div>
+  <input type="file" id="photoInput" accept="image/*" hidden>
 
   <section class="share">
     <h2>친구에게 보내기</h2>
@@ -438,11 +446,14 @@ const PICS = [
   {id:"cat", name:"구름 고양이", draw:drawCat},
   {id:"hamster", name:"생일 햄찌", draw:drawHamster},
 ];
-PICS.forEach(p=>{
-  const c=document.createElement("canvas"); c.width=c.height=S;
-  p.draw(c.getContext("2d")); p.canvas=c;
+function finishPic(p){
+  const c=p.canvas;
   p.thumb=(()=>{const t=document.createElement("canvas"); t.width=t.height=240; t.getContext("2d").drawImage(c,0,0,240,240); return t.toDataURL("image/png");})();
   p.big=(()=>{const t=document.createElement("canvas"); t.width=t.height=360; t.getContext("2d").drawImage(c,0,0,360,360); return t.toDataURL("image/png");})();
+}
+PICS.forEach(p=>{
+  const c=document.createElement("canvas"); c.width=c.height=S;
+  p.draw(c.getContext("2d")); p.canvas=c; finishPic(p);
 });
 
 /* ---------- 저장 ---------- */
@@ -462,20 +473,50 @@ let pieces=[], L=null, zTop=10, placed=0, startT=0, timerId=0, finished=false, h
 const DPR=Math.min(2,window.devicePixelRatio||1);
 
 /* ---------- 고르기 UI ---------- */
-const picsEl=$("pics");
-PICS.forEach((p,i)=>{
-  const b=document.createElement("button");
-  b.className="pic"; b.dataset.i=i;
-  b.innerHTML=`<img alt="" src="${p.thumb}"><span>${p.name}</span><small></small>`;
-  b.addEventListener("click",()=>{ picIdx=i; store.set("mallang-pic",p.id); audio(); showGame(); });
-  picsEl.appendChild(b);
+const picsEl=$("pics"), photoInput=$("photoInput");
+function renderPics(){
+  picsEl.innerHTML="";
+  const add=document.createElement("button");
+  add.className="pic";
+  add.innerHTML=`<div class="add"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg><b>+</b></div><span>사진 넣기</span><small>갤러리에서</small>`;
+  add.addEventListener("click",()=>{ audio(); photoInput.value=""; photoInput.click(); });
+  picsEl.appendChild(add);
+  PICS.forEach((p,i)=>{
+    const b=document.createElement("button");
+    b.className="pic"; b.dataset.i=i;
+    b.innerHTML=`<img alt="" src="${p.thumb}"><span>${p.name}</span><small></small>`;
+    b.addEventListener("click",()=>{ picIdx=i; store.set("mallang-pic",p.id); audio(); showGame(); });
+    picsEl.appendChild(b);
+  });
+  syncPickers();
+}
+function makePhotoPic(img,save){
+  const c=document.createElement("canvas"); c.width=c.height=S;
+  const g=c.getContext("2d"), w=img.naturalWidth, h=img.naturalHeight, side=Math.min(w,h);
+  g.fillStyle="#fff"; g.fillRect(0,0,S,S);
+  g.drawImage(img,(w-side)/2,(h-side)*.35,side,side,0,0,S,S);
+  const p={id:"photo",name:"내 사진",canvas:c}; finishPic(p);
+  const at=PICS.findIndex(q=>q.id==="photo");
+  if(at>=0) PICS[at]=p; else PICS.push(p);
+  if(save) store.set("mallang-photo",c.toDataURL("image/jpeg",.85));
+  return PICS.indexOf(p);
+}
+photoInput.addEventListener("change",()=>{
+  const file=photoInput.files&&photoInput.files[0]; if(!file) return;
+  const url=URL.createObjectURL(file), img=new Image();
+  img.onload=()=>{
+    picIdx=makePhotoPic(img,true); URL.revokeObjectURL(url);
+    store.set("mallang-pic","photo"); renderPics(); showGame();
+  };
+  img.onerror=()=>{ URL.revokeObjectURL(url); toast("이 사진은 열 수 없어요. 다른 사진을 골라 주세요"); };
+  img.src=url;
 });
 document.querySelectorAll(".lvl").forEach(b=>b.addEventListener("click",()=>{
   N=+b.dataset.n; store.set("mallang-n",N); syncPickers();
 }));
 function syncPickers(){
   document.querySelectorAll(".lvl").forEach(b=>b.setAttribute("aria-checked",+b.dataset.n===N));
-  picsEl.querySelectorAll(".pic").forEach(b=>{
+  picsEl.querySelectorAll(".pic[data-i]").forEach(b=>{
     const best=+store.get(`mallang-best-${PICS[+b.dataset.i].id}-${N}`)||0;
     b.querySelector("small").textContent=best?`최고 기록 ${fmt(best)}`:"아직 도전 전";
   });
@@ -750,7 +791,13 @@ window.addEventListener("resize",()=>{
   },200);
 });
 
-syncHint(); syncSound(); syncPickers();
+syncHint(); syncSound(); renderPics();
+(()=>{
+  const saved=store.get("mallang-photo"); if(!saved) return;
+  const img=new Image();
+  img.onload=()=>{ const i=makePhotoPic(img,false); if(store.get("mallang-pic")==="photo") picIdx=i; renderPics(); };
+  img.src=saved;
+})();
 })();
 </script>
 
