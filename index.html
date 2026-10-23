@@ -19,9 +19,9 @@
 <title>윤지 말랑 퍼즐</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <meta name="theme-color" content="#fff2f6">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jua&family=Gowun+Dodum&display=swap">
 <style>
+@font-face{font-family:"Jua";src:url("fonts/Jua.woff2") format("woff2");font-display:swap}
+@font-face{font-family:"Gowun Dodum";src:url("fonts/GowunDodum.woff2") format("woff2");font-display:swap}
 /* Layout: 한 화면 놀이판 — 위에 그림·난이도 고르기, 아래에 퍼즐판과 조각 상자 */
 :root{
   --bg:#fff2f6;
@@ -539,8 +539,16 @@ const SHARE_URL="https://parksunghyon.github.io/mallang-puzzle/";
 $("shareUrl").value=SHARE_URL;
 let toastT=0;
 function toast(msg){ const t=$("toast"); t.textContent=msg; t.hidden=false; clearTimeout(toastT); toastT=setTimeout(()=>t.hidden=true,2600); }
+const inApp=!!window.AndroidApp;
+if(inApp) $("shareBtn").textContent="카톡으로 보내기";
+window.appBack=()=>{
+  if(!$("winBox").hidden){ $("winBox").hidden=true; showMenu(); return true; }
+  if(!game.hidden){ showMenu(); return true; }
+  return false;
+};
 $("shareBtn").addEventListener("click",()=>{
   const text="윤지 말랑 퍼즐 같이 해요! 귀여운 그림 조각 맞추기 "+SHARE_URL;
+  if(inApp){ try{ window.AndroidApp.share(text); return; }catch(e){} }
   const fallback=()=>{ const i=$("shareUrl"); i.focus(); i.select(); toast("링크를 길게 눌러 복사해 주세요"); };
   try{
     navigator.clipboard.writeText(text).then(()=>toast("복사했어요! 카톡 대화방에 붙여넣기 하세요"),fallback);
