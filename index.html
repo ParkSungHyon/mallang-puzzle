@@ -108,7 +108,7 @@ button:focus-visible{outline:3px solid var(--berry);outline-offset:2px}
   padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
   padding-block:8px 8px;max-width:1180px;margin:0 auto;
 }
-.back{font-size:15px;background:var(--paper);border-radius:12px;padding:9px 10px;box-shadow:0 3px 0 var(--line);flex:none}
+.back{min-height:44px;font-size:15px;background:var(--paper);border-radius:12px;padding:9px 10px;box-shadow:0 3px 0 var(--line);flex:none}
 .levels{display:flex;gap:8px}
 .lvl{
   flex:1;background:var(--paper);border-radius:16px;box-shadow:0 3px 0 var(--line);
@@ -131,7 +131,7 @@ button:focus-visible{outline:3px solid var(--berry);outline-offset:2px}
 .bar{height:9px;border-radius:9px;background:var(--tray);overflow:hidden}
 .bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--mint),var(--berry));border-radius:9px;transition:width .35s}
 .tool{
-  font-size:14px;background:var(--tray);border-radius:12px;padding:8px 10px;flex:none;white-space:nowrap;
+  font-size:14px;background:var(--tray);border-radius:12px;padding:8px 10px;flex:none;white-space:nowrap;min-height:44px;min-width:44px;
 }
 .tool[aria-pressed="true"]{background:var(--butter)}
 #field{position:relative;margin:0 auto;touch-action:none;user-select:none;-webkit-user-select:none}
@@ -733,11 +733,11 @@ function endDrag(e){
   const p=drag.p; drag=null;
   p.el.classList.remove("drag");
   const t=targetOf(p);
-  if(Math.hypot(p.x-t.x,p.y-t.y)<L.cell*.34){
+  if(Math.hypot(p.x-t.x,p.y-t.y)<L.cell*.42){
     p.x=t.x; p.y=t.y; p.locked=true; placeEl(p);
     p.el.classList.add("locked","pop");
     setTimeout(()=>p.el.classList.remove("pop"),400);
-    placed++; updateCount(); sfx.snap();
+    placed++; updateCount(); sfx.snap(); buzz(25);
     if(placed===N*N) finish();
   }else if(Math.abs(p.x-t.x)<L.cell*.8 && Math.abs(p.y-t.y)<L.cell*.8){
     sfx.miss();
@@ -746,8 +746,10 @@ function endDrag(e){
 field.addEventListener("pointerup",endDrag);
 field.addEventListener("pointercancel",endDrag);
 
+function buzz(p){ try{ if(navigator.vibrate) navigator.vibrate(p); }catch(e){} }
 /* ---------- 완성 ---------- */
 function finish(){
+  buzz([60,40,120]);
   finished=true; clearInterval(timerId);
   const ms=startT?performance.now()-startT:0;
   const key=`mallang-best-${PICS[picIdx].id}-${N}`;
