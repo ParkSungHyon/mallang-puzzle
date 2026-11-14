@@ -162,7 +162,8 @@ button:focus-visible{outline:3px solid var(--berry);outline-offset:2px}
   animation:rise .5s cubic-bezier(.2,1.4,.4,1);
 }
 @keyframes rise{from{transform:translateY(30px) scale(.9);opacity:0}to{transform:none;opacity:1}}
-.win img{width:170px;height:170px;border-radius:20px;box-shadow:0 0 0 5px var(--butter)}
+.win img{width:170px;height:170px;border-radius:20px;box-shadow:0 0 0 5px var(--butter);animation:boing .9s .35s cubic-bezier(.3,1.6,.5,1) both}
+@keyframes boing{0%{transform:scale(.6) rotate(-6deg)}100%{transform:none}}
 .win h2{font-family:var(--display);font-weight:400;font-size:30px;margin:4px 0 0;color:var(--berry-deep)}
 .win p{margin:0;color:var(--ink-soft);font-size:15px}
 .stars{display:flex;gap:6px}
@@ -441,10 +442,49 @@ function drawHamster(g){
   E(g,318,650,34,27,"#f7c48f",INK); E(g,482,650,34,27,"#f7c48f",INK);
 }
 
+
+/* ---------- 장면 4: 바다 펭귄 ---------- */
+function drawPenguin(g){
+  const bg=g.createLinearGradient(0,0,0,S); bg.addColorStop(0,"#bfe6ff"); bg.addColorStop(.55,"#e4f6ff"); bg.addColorStop(1,"#fff8e6");
+  g.fillStyle=bg; g.fillRect(0,0,S,S);
+  E(g,650,130,62,62,"#fff3a8");
+  cloud(g,150,120,46,"#fff"); cloud(g,470,90,36,"#fff");
+  // 바다
+  g.fillStyle="#7cc8f2"; g.fillRect(0,470,S,140);
+  g.strokeStyle="#fff"; g.lineWidth=6; g.lineCap="round";
+  for(let y=500;y<600;y+=40){ g.beginPath(); for(let x=-20;x<=S+20;x+=60){ g.moveTo(x,y); g.quadraticCurveTo(x+15,y-12,x+30,y); } g.stroke(); }
+  // 빙하
+  g.fillStyle="#ffffff"; g.beginPath(); g.moveTo(-10,800); g.lineTo(-10,640); g.quadraticCurveTo(200,580,400,610); g.quadraticCurveTo(620,580,810,640); g.lineTo(810,800); g.closePath(); g.fill();
+  g.strokeStyle="#cfe9f7"; g.lineWidth=8; g.stroke();
+  // 물고기
+  [[120,540,"#ffb36b"],[700,560,"#ff8fb1"]].forEach(([x,y,c])=>{ E(g,x,y,30,18,c,INK,4); g.beginPath(); g.moveTo(x+28,y); g.lineTo(x+50,y-16); g.lineTo(x+50,y+16); g.closePath(); g.fillStyle=c; g.fill(); g.lineWidth=4; g.strokeStyle=INK; g.stroke(); E(g,x-14,y-4,4,4,INK); });
+  // 펭귄 몸
+  E(g,400,520,170,190,"#3d4f73",INK);
+  E(g,400,555,125,150,"#fffaf6");
+  // 날개
+  E(g,238,520,40,95,"#3d4f73",INK,7,.35); E(g,562,520,40,95,"#3d4f73",INK,7,-.35);
+  // 머리
+  E(g,400,320,150,130,"#3d4f73",INK);
+  g.beginPath(); g.moveTo(280,330); g.bezierCurveTo(290,230,510,230,520,330); g.bezierCurveTo(520,420,280,420,280,330); g.fillStyle="#fffaf6"; g.fill();
+  eye(g,350,330); eye(g,450,330);
+  blush(g,312,380,24,14); blush(g,488,380,24,14);
+  g.beginPath(); g.moveTo(380,370); g.lineTo(420,370); g.lineTo(400,395); g.closePath(); g.fillStyle="#ffb84d"; g.fill(); g.lineWidth=4; g.strokeStyle=INK; g.stroke();
+  // 털모자
+  g.beginPath(); g.moveTo(275,250); g.quadraticCurveTo(400,110,525,250); g.closePath(); g.fillStyle="#ff6f9c"; g.fill(); g.lineWidth=7; g.strokeStyle=INK; g.stroke();
+  g.fillStyle="#fff"; g.fillRect(270,240,260,30); g.strokeRect(270,240,260,30);
+  E(g,400,145,26,26,"#fff",INK,6);
+  // 발
+  E(g,350,712,45,22,"#ffb84d",INK,6); E(g,450,712,45,22,"#ffb84d",INK,6);
+  // 목도리
+  g.fillStyle="#8fd0ff"; g.beginPath(); g.ellipse(400,440,120,26,0,0,TAU); g.fill(); g.lineWidth=6; g.strokeStyle=INK; g.stroke();
+  star(g,150,330,20,"#fff4a8"); star(g,640,300,16,"#fff4a8");
+}
+
 const PICS = [
   {id:"bunny", name:"딸기 토끼", draw:drawBunny},
   {id:"cat", name:"구름 고양이", draw:drawCat},
   {id:"hamster", name:"생일 햄찌", draw:drawHamster},
+  {id:"penguin", name:"바다 펭귄", draw:drawPenguin},
 ];
 function finishPic(p){
   const c=p.canvas;
@@ -772,14 +812,14 @@ function confetti(){
   const cv=$("confetti"); cv.hidden=false;
   const w=cv.width=innerWidth*DPR, h=cv.height=innerHeight*DPR, g=cv.getContext("2d");
   const cols=["#ff6f9c","#ffd36b","#8fd0ff","#9fe0c8","#b7a0ff"];
-  const parts=Array.from({length:140},()=>({x:Math.random()*w,y:-Math.random()*h*.6,vx:(Math.random()-.5)*3*DPR,vy:(2+Math.random()*3)*DPR,r:Math.random()*TAU,vr:(Math.random()-.5)*.3,s:(5+Math.random()*6)*DPR,c:cols[Math.floor(Math.random()*cols.length)],heart:Math.random()<.25}));
+  const parts=Array.from({length:140},()=>({x:Math.random()*w,y:-Math.random()*h*.6,vx:(Math.random()-.5)*3*DPR,vy:(2+Math.random()*3)*DPR,r:Math.random()*TAU,vr:(Math.random()-.5)*.3,s:(5+Math.random()*6)*DPR,c:cols[Math.floor(Math.random()*cols.length)],heart:Math.random()<.25,star:Math.random()<.2}));
   const t0=performance.now();
   (function frame(t){
     g.clearRect(0,0,w,h);
     parts.forEach(p=>{
       p.x+=p.vx; p.y+=p.vy; p.r+=p.vr;
       g.save(); g.translate(p.x,p.y); g.rotate(p.r);
-      if(p.heart) heart(g,0,-p.s,p.s*2,p.c); else { g.fillStyle=p.c; g.fillRect(-p.s/2,-p.s/4,p.s,p.s/2); }
+      if(p.heart) heart(g,0,-p.s,p.s*2,p.c); else if(p.star) star(g,0,0,p.s*1.1,p.c); else { g.fillStyle=p.c; g.fillRect(-p.s/2,-p.s/4,p.s,p.s/2); }
       g.restore();
     });
     if(t-t0<3600) requestAnimationFrame(frame); else { g.clearRect(0,0,w,h); cv.hidden=true; }
