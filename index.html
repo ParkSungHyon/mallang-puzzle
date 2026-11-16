@@ -85,6 +85,8 @@ button:focus-visible{outline:3px solid var(--berry);outline-offset:2px}
 }
 .pic .add svg{width:44%;height:44%}
 .pic .add b{position:absolute;right:16%;bottom:16%;width:34px;height:34px;border-radius:50%;background:var(--berry);color:#fff;font-weight:400;font-size:26px;line-height:34px}
+.pic{position:relative}
+.pic.done::after{content:"완성!";position:absolute;top:4px;right:4px;background:var(--berry);color:#fff;font-family:var(--display);font-size:13px;padding:3px 8px;border-radius:10px;box-shadow:0 2px 0 var(--berry-deep)}
 .pic small{font-family:var(--body);font-size:13px;color:var(--ink-soft);margin-top:-6px}
 .share{
   background:var(--paper);border-radius:22px;padding:16px;box-shadow:0 4px 0 var(--line);
@@ -199,9 +201,9 @@ button:focus-visible{outline:3px solid var(--berry);outline-offset:2px}
 
   <p class="step"><em>1.</em> 몇 조각으로 할까요?</p>
   <div class="levels" role="radiogroup" aria-label="난이도" id="levels">
-    <button class="lvl" role="radio" data-n="3"><b>쉬움</b><small>9조각</small></button>
-    <button class="lvl" role="radio" data-n="4"><b>보통</b><small>16조각</small></button>
-    <button class="lvl" role="radio" data-n="5"><b>어려움</b><small>25조각</small></button>
+    <button class="lvl" role="radio" data-n="3"><b>🌱 쉬움</b><small>9조각</small></button>
+    <button class="lvl" role="radio" data-n="4"><b>🌷 보통</b><small>16조각</small></button>
+    <button class="lvl" role="radio" data-n="5"><b>🌟 어려움</b><small>25조각</small></button>
   </div>
 
   <p class="step"><em>2.</em> 그림이나 사진을 고르면 시작해요</p>
@@ -559,6 +561,7 @@ function syncPickers(){
   picsEl.querySelectorAll(".pic[data-i]").forEach(b=>{
     const best=+store.get(`mallang-best-${PICS[+b.dataset.i].id}-${N}`)||0;
     b.querySelector("small").textContent=best?`최고 기록 ${fmt(best)}`:"아직 도전 전";
+    b.classList.toggle("done",!!best);
   });
   $("mini").src=PICS[picIdx].thumb;
 }
